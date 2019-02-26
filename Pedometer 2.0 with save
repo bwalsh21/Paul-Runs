@@ -1,0 +1,84 @@
+//
+//  ViewController.swift
+//  Paul Runs
+//
+//  Created by Bryce Walsh on 2/25/19.
+//  Copyright © 2019 Bryce Walsh. All rights reserved.
+//
+
+import UIKit
+import CoreMotion
+import CoreData
+
+class ViewController: UIViewController {
+
+    @IBOutlet var stepsCountLabel: UILabel!
+    
+    private let activityManager = CMMotionActivityManager()
+    
+    private let pedometer = CMPedometer()
+    
+    @IBAction func Emmissions(_ sender: UIButton)
+    {
+        
+        func startCountingDistance() {
+            pedometer.startUpdates(from: Date()) {
+                [weak self] pedometerData, error in
+                guard let pedometerData = pedometerData, error == nil else { return }
+                self?.stepsCountLabel.text = String(round(100.0 * (Double(truncating: pedometerData.distance!) * 0.00031835268)) / 100.0)
+                startUpdating()
+            }
+            
+        }
+        
+        func startUpdating() {
+            
+            if CMPedometer.isDistanceAvailable() {
+                startCountingDistance()
+            }
+        }
+        startCountingDistance()
+    }
+    override func viewDidLoad() {
+        getData()
+        stepsCountLabel.text = "\(stepsCountLabel.text ?? "0"))"
+        
+        super.viewDidLoad()
+        
+    }
+
+    @IBAction func saveData(_ sender: UIButton) {
+        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+        let entity = NSEntityDescription.entity(forEntityName: "Entity", in: context)
+        let newEntity = NSManagedObject(entity: entity!, insertInto: context)
+        
+        newEntity.setValue(stepsCountLabel.text, forKey: "number")
+        
+        do {
+            try context.save()
+            print("saved")
+        } catch{
+           print ("failed saving")
+        }
+        
+    }
+    func getData()
+    {
+        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Entity")
+        request.returnsObjectsAsFaults = false
+        do {
+            let results = try context.fetch(request)
+            for data in results as! [NSManagedObject]
+            {
+                stepsCountLabel.text = data.value(forKey: "number") as? String
+            }
+        }catch{
+             print("fails")
+            }
+        }
+    }
+
+    
+
+
