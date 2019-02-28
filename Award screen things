@@ -1,0 +1,80 @@
+import UIKit
+
+class AwardScreenViewController: UIViewController {
+
+
+    
+    @IBOutlet var Award1BTN: UIButton!
+    @IBOutlet var Award1btn: [UIButton]!
+    @IBAction func Award1btn(_ sender: Any) {
+        press1()
+    }
+
+    @IBOutlet var Award2BTN: UIButton!
+    @IBOutlet var Award2btn: [UIButton]!
+    @IBAction func Award2btn(_ sender: Any) {
+    press2()
+    }
+    
+    @IBOutlet var Award3BTN: UIButton!
+    @IBOutlet var Award3btn: [UIButton]!
+    @IBAction func Award3btn(_ sender: Any) {
+    press3()
+    }
+    
+    
+    @IBOutlet var Label1: UILabel!
+    
+    @IBOutlet var noLabel1: UILabel!
+    
+    @IBOutlet var Label2: UILabel!
+    
+    @IBOutlet var noLabel2: UILabel!
+    
+    @IBOutlet var Label3: UILabel!
+    
+    @IBOutlet var noLabel3: UILabel!
+    
+    
+    
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+       //Award1BTN.isHidden = false
+       //Award2BTN.isHidden = false
+       //Award3BTN.isHidden = false
+       Label1.isHidden = true
+       noLabel1.isHidden = true
+       Label2.isHidden = true
+       noLabel2.isHidden = true
+       Label3.isHidden = true
+       noLabel3.isHidden = true
+        
+        
+    }
+    func press1(){
+        Award1BTN.isHidden = true
+        Label1.isHidden = false
+        // if miles < 5 {
+        noLabel1.isHidden = false
+        //Label1.isHidden = true
+        //}
+    }
+
+    func press2() {
+        Award2BTN.isHidden = true
+        Label2.isHidden = false
+    //include if statement
+        noLabel2.isHidden = false
+    // noLabel2.isHidden = true
+    }
+   
+    func press3(){
+       Award3BTN.isHidden = true
+       Label3.isHidden = false
+    //include if statement
+       noLabel3.isHidden = false
+    //noLabel3.isHidden = true
+    }
+
+}
