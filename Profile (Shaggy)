@@ -1,0 +1,38 @@
+import UIKit
+
+class PFPViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+
+    @IBOutlet weak var PFP_IMG: UIImageView!
+    
+    
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        self.PFP_IMG.layer.cornerRadius = self.PFP_IMG.frame.size.width / 2;
+        self.PFP_IMG.clipsToBounds = true;
+    }
+    
+    @IBAction func SELECT_PFP_BTN(_ sender: AnyObject) {
+        
+        let myPickerController = UIImagePickerController()
+        myPickerController.delegate = self
+        myPickerController.sourceType = UIImagePickerController.SourceType.photoLibrary
+        
+        self.present(myPickerController, animated: true, completion: nil)
+        
+        
+        
+        
+    }
+     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any])
+     {
+        
+        PFP_IMG.image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage
+        
+        self.dismiss(animated: true, completion: nil)
+        
+    }
+
+}
+
