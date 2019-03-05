@@ -1,0 +1,121 @@
+//
+//  ViewController.swift
+//  Paul Runs
+//
+//  Created by Bryce Walsh on 2/25/19.
+//  Copyright © 2019 Bryce Walsh. All rights reserved.
+//
+
+import UIKit
+import CoreMotion
+import CoreData
+
+class ViewController: UIViewController {
+    var stl = ""
+    
+    var oldDistance = 0.0
+    
+    var CurrentDistance = 0.0
+
+    @IBOutlet var stepsCountLabel: UILabel!
+    
+    private let activityManager = CMMotionActivityManager()
+    
+    private let pedometer = CMPedometer()
+    
+    @IBAction func Emmissions(_ sender: UIButton)
+    {
+        startCountingDistance()
+        if oldDistance > 2.5
+        {
+        self.stl = stepsCountLabel.text!
+        performSegue(withIdentifier: "segue", sender: self)
+        }
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        var vc = segue.destination as! AwardScreen
+        vc.finalName = self.stl
+    }
+    override func viewDidLoad() {
+        getData()
+        
+        super.viewDidLoad()
+        
+    }
+    
+
+    @IBAction func saveData(_ sender: UIButton) {
+        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+        let entity = NSEntityDescription.entity(forEntityName: "Entity", in: context)
+        let newEntity = NSManagedObject(entity: entity!, insertInto: context)
+        
+        newEntity.setValue(stepsCountLabel.text, forKey: "number")
+        
+        do {
+            try context.save()
+            print("saved")
+        } catch{
+           print ("failed saving")
+        }
+        
+    }
+    func getData()
+    {
+        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Entity")
+        request.returnsObjectsAsFaults = false
+        do {
+            let results = try context.fetch(request)
+            for data in results as! [NSManagedObject]
+            {
+                stepsCountLabel.text = data.value(forKey: "number") as? String
+            }
+        }catch{
+             print("fails")
+            }
+        }
+    func startCountingDistance() {
+        //pedometer.startUpdates(from: Date()) {
+          // [weak self] pedometerData, error in
+          // guard let pedometerData = pedometerData, error == nil else { return }
+            
+          //  self?.stepsCountLabel.text = pedometerData.distance?.stringValue
+            CurrentDistance = round(Double(8046.7) * 0.00031835268)
+        oldDistance = CFStringGetDoubleValue((self.stepsCountLabel?.text! as! CFString))
+            self.stepsCountLabel.text  = String((CurrentDistance + oldDistance))
+        
+            
+        }
+    
+
+    
+}
+
+//Award Screen Code Below
+
+
+//
+//  AwardScreen.swift
+//  Paul Runs
+//
+//  Created by Bryce Walsh on 3/4/19.
+//  Copyright © 2019 Bryce Walsh. All rights reserved.
+//
+
+import UIKit
+
+class AwardScreen: UIViewController {
+    @IBOutlet var distanceLabel: UILabel!
+    
+    var finalName = ""
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        distanceLabel.text = finalName
+        
+    }
+    
+
+
+}
