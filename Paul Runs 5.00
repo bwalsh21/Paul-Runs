@@ -1,0 +1,163 @@
+//
+//  ViewController.swift
+//  Paul Runs 5.0
+//
+//  Created by 21-Walsh,Bryce on 3/5/19.
+//  Copyright © 2019 21-Walsh,Bryce. All rights reserved.
+//
+
+import UIKit
+import CoreMotion
+import CoreData
+
+class ViewController: UIViewController {
+    var stl = ""
+    
+    var oldDistance = 0.0
+    
+    var CurrentDistance = 0.0
+    
+    var distanceLabel = ""
+    
+    @IBOutlet var stepsCountLabel: UILabel!
+    
+    private let activityManager = CMMotionActivityManager()
+    
+    private let pedometer = CMPedometer()
+    
+    private let pedData = CMPedometerData()
+    
+    @IBOutlet var activityTypeLabel: UILabel!
+    
+    @IBAction func Emmissions(_ sender: UIButton)
+    {
+        
+        if oldDistance > 2.5
+        {
+            self.stl = stepsCountLabel.text!
+            performSegue(withIdentifier: "segue", sender: self)
+        }
+    }
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let vc = segue.destination as! SecondViewController
+        vc.finalName = self.stl
+    }
+    
+    
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        getData()
+        startUpdating()
+        
+    }
+    
+    @IBAction func saveData(_ sender: UIButton)
+    {
+        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+        let entity = NSEntityDescription.entity(forEntityName: "Entity", in: context)
+        let newEntity = NSManagedObject(entity: entity!, insertInto: context)
+        if distanceLabel != "0" {
+            newEntity.setValue(stepsCountLabel.text, forKey: "number")
+        }else{
+            self.stepsCountLabel.text = "0"
+        }
+        do {
+            try context.save()
+            print("saved")
+        } catch{
+            print ("failed saving")
+        }
+
+    }
+    func getData()
+    {
+        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Entity")
+        request.returnsObjectsAsFaults = false
+        do {
+            let results = try context.fetch(request)
+            for data in results as! [NSManagedObject]
+            {
+               stepsCountLabel.text = data.value(forKey: "number") as? String
+            }
+        }catch{
+            print("fails")
+        }
+    }
+    private func startTrackingActivityType() {
+        activityManager.startActivityUpdates(to: OperationQueue.main) {
+            [weak self] (activity: CMMotionActivity?) in
+            
+            guard let activity = activity else { return }
+            DispatchQueue.main.async {
+                if activity.walking {
+                    self?.activityTypeLabel.text = "Walking"
+                } else if activity.stationary {
+                    self?.activityTypeLabel.text = "Stationary"
+                } else if activity.running {
+                    self?.activityTypeLabel.text = "Running"
+            }
+          }
+        }
+      }
+        func startCountingDistance() {
+            pedometer.startUpdates(from: Date()) {
+                [weak self] pedometerData, error in
+                guard let pedometerData = pedometerData, error == nil else { return }
+                
+                DispatchQueue.main.async {
+                    if self?.stepsCountLabel.text != nil{
+                        self?.stepsCountLabel.text = self?.pedData.distance?.stringValue
+                    }else{
+                       self?.stepsCountLabel.text = "0"
+                    }
+                    
+                    }
+                }
+            }
+
+        func startUpdating() {
+            if CMMotionActivityManager.isActivityAvailable() {
+                startTrackingActivityType()
+            }
+            
+            if CMPedometer.isStepCountingAvailable() {
+                startCountingDistance()
+                
+            }
+
+         }
+    
+   }
+
+
+
+award view controller
+
+//
+//  SecondViewController.swift
+//  Paul Runs 5.0
+//
+//  Created by 21-Walsh,Bryce on 3/5/19.
+//  Copyright © 2019 21-Walsh,Bryce. All rights reserved.
+//
+
+import UIKit
+
+class SecondViewController: UIViewController {
+
+    @IBOutlet var distanceLabel: UILabel!
+    
+    var finalName = ""
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        distanceLabel.text = finalName
+    }
+    
+
+  
+
+}
+
